@@ -115,3 +115,22 @@ Mọi mức phạt mang tính tham khảo từ luật GT Việt Nam (2024–2025
 
 
 
+
+---
+
+## Kiến trúc mới: hai model
+
+Thay vì một model làm tất cả, hệ thống tách thành hai model:
+
+1. **Model định vị (`localizer`)**: nhận ảnh đầy đủ, dự đoán khung bao của biển báo.
+2. **Model phân loại (`recognizer`)**: nhận vùng biển báo đã cắt (48×48), dự đoán 1 trong 43 lớp.
+
+Hai model được huấn luyện riêng và ghép lại trong `pipeline.py`.
+
+```bash
+pip install -r requirements.txt
+python train.py --data path/to/gtsrb --out models     # huấn luyện cả hai model
+python evaluate.py --data path/to/gtsrb --models models  # đánh giá trên tập kiểm tra
+```
+
+Dữ liệu GTSRB tải từ Kaggle (xem link ở trên), giải nén để có `Train.csv`, `Test.csv` và thư mục `Train/`, `Test/`.
