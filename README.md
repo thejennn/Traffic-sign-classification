@@ -1,5 +1,3 @@
-> **Nguồn gốc:** Dự án được đăng lại từ [Lilkremxxxx/Traffic-sign_classification](https://github.com/Lilkremxxxx/Traffic-sign_classification) theo giấy phép MIT, với sự cho phép của tác giả gốc. Bản quyền thuộc về Lilkremxxx (xem file LICENSE).
-
 # Nhận diện biển báo giao thông Việt Nam (YOLO + CNN)
 
 Hệ thống nhận diện biển báo giao thông Việt Nam theo hai bước:
@@ -101,8 +99,6 @@ Sau khi huấn luyện, copy `best.pt` của YOLO thành `models/detector_best.p
 | `evaluate.py` | Đánh giá hệ thống trên tập test |
 | `models/` | Model đã huấn luyện và danh sách lớp |
 
-Các file `traffic_sign.py` và `GUI.py` là phần của bản gốc, chỉ dùng model 43 lớp cũ (`my_model.h5`), không liên quan đến pipeline hiện tại.
-
 ## Giấy phép
 
-MIT. Giữ nguyên thông báo bản quyền của Lilkremxxx theo yêu cầu của giấy phép gốc.
+MIT. Bản quyền thuộc về thejennn.
