@@ -15,6 +15,12 @@ Model 2 được pretrain trên GTSRB (43 lớp biển báo Đức, tải từ K
 > - Vòng xuyến phía trước (Roundabout ahead)
 > - Giới hạn tốc độ 60 km/h (Speed limit 60kmh)
 
+## Demo
+
+Nhận diện qua webcam laptop (biển "Cấm quay đầu" được hiện trên điện thoại):
+
+![Demo webcam](docs/demo-webcam.png)
+
 ## Kết quả
 
 Đánh giá trên tập test của bộ Roboflow (140 biển báo thật trên 103 ảnh):
