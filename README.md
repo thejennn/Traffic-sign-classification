@@ -1,136 +1,108 @@
 > **Nguồn gốc:** Dự án được đăng lại từ [Lilkremxxxx/Traffic-sign_classification](https://github.com/Lilkremxxxx/Traffic-sign_classification) theo giấy phép MIT, với sự cho phép của tác giả gốc. Bản quyền thuộc về Lilkremxxx (xem file LICENSE).
 
-# Traffic-sign_classification
-This project involves building a deep learning model using Convolutional Neural Networks (CNN) to recognize Vietnamese traffic signs. Developed with Python and TensorFlow, it processes both images and live camera input. The system displays the traffic sign’s name, the corresponding penalty based on vehicle type, and the model’s confidence level.
+# Nhận diện biển báo giao thông Việt Nam (YOLO + CNN)
 
-Dự án này xây dựng một mô hình học sâu sử dụng mạng nơ-ron tích chập (CNN) để nhận diện biển báo giao thông Việt Nam. Hệ thống được phát triển bằng Python và TensorFlow, có khả năng xử lý ảnh tĩnh và dữ liệu từ camera trực tiếp. Ứng dụng hiển thị tên biển báo, mức phạt theo loại phương tiện và độ tin cậy của mô hình.
+Hệ thống nhận diện biển báo giao thông Việt Nam theo hai bước:
 
-Dự án này sử dụng Dataset: **GTSRB - German Traffic Sign Recognition Benchmark**, available on Kaggle:
-[GTSRB - German Traffic Sign Recognition Benchmark](https://www.kaggle.com/datasets/meowmeowmeowmeowmeow/gtsrb-german-traffic-sign)
+1. **Model 1 – định vị (YOLOv8n):** tìm khung bao của biển báo trong ảnh hoặc khung hình webcam.
+2. **Model 2 – phân loại (CNN):** phân loại vùng biển báo đã cắt thành một trong **6 lớp**.
 
-**Provided by user**: meowmeowmeowmeowmeow.
+Model 2 được pretrain trên GTSRB (43 lớp biển báo Đức, tải từ Kaggle) để học đặc trưng biển báo, rồi tinh chỉnh trên bộ biển báo Việt Nam của Roboflow.
 
+> **Phạm vi hiện tại:** hệ thống chỉ nhận được **6 loại biển** sau đây. Biển khác sẽ không được nhận đúng.
+> - Cấm quay đầu (No U-turn)
+> - Cấm đi ngược chiều (No going opposite)
+> - Cấm dừng (No stopping)
+> - Cấm đỗ (No waiting)
+> - Vòng xuyến phía trước (Roundabout ahead)
+> - Giới hạn tốc độ 60 km/h (Speed limit 60kmh)
 
-# 🚦 Traffic Sign Recognition using CNN
+## Kết quả
 
-Ứng dụng nhận diện **biển báo giao thông Việt Nam** bằng **mạng nơ-ron tích chập (CNN)**, hiển thị tên biển báo, mức phạt theo phương tiện (ô tô/xe máy) và độ tin cậy. Hỗ trợ cả ảnh tĩnh và nhận diện qua camera.
+Đánh giá trên tập test của bộ Roboflow (140 biển báo thật trên 103 ảnh):
 
----
+| Chỉ số | Kết quả |
+|---|---|
+| Phát hiện được (IoU ≥ 0,5) | 94,3% |
+| Phân loại đúng (trên vùng biển thật) | 98,6% |
+| Cả hệ thống đúng | 93,6% |
 
-## 🧠 1. Mô tả dự án
+Model YOLO đạt mAP50 = 0,947 trên tập validation. Tập test chỉ có 140 biển báo nên sai số khá lớn.
 
-- Huấn luyện mô hình CNN với 43 loại biển báo.
-- Giao diện đồ họa (GUI) thân thiện bằng Tkinter.
-- Hiển thị thông tin mức phạt tương ứng theo luật giao thông Việt Nam.
-- Tùy chọn ảnh đầu vào hoặc sử dụng webcam.
+**Hạn chế đã biết:**
+- Dữ liệu chụp từ xe, độ phân giải 1920×1080. Ảnh từ webcam hoặc màn hình có thể cho kết quả kém hơn.
+- Biển phải đủ lớn trong khung hình. Biển nhỏ hoặc xa thường không được phát hiện.
+- Chưa đo độ chính xác trên tập test GTSRB chính thức.
 
----
-
-## 🗂️ 2. Dataset
-
-- Dataset: [GTSRB German Traffic Sign – Kaggle](https://www.kaggle.com/datasets/meowmeowmeowmeowmeow/gtsrb-german-traffic-sign)
-- Gồm 43 lớp biển báo, định dạng ảnh `.ppm`, được resize về 30×30 px.
-
-🖼️ **Hình minh họa 1: Một số ảnh từ tập dữ liệu**
-
-![00006](https://github.com/user-attachments/assets/b2473d03-1478-4548-9cbf-8fec38e9b508) ![00009](https://github.com/user-attachments/assets/5be14d24-645f-420f-bb77-63646c3a934a)  ![00044](https://github.com/user-attachments/assets/6b39127c-a992-4731-8233-0db4cde5d214)
-
-
-
----
-
-## 🧪 3. Cài đặt & Huấn luyện
-
-### Yêu cầu cài đặt
-```bash
-pip install -r requirements.txt
-```
-### Huấn luyện mô hình
-Chạy file huấn luyện:
-
-```bash
-python traffic_sign.py
-```
-Sau khi huấn luyện, mô hình được lưu tại my_model.h5.
----
-
-## 🖥️ 4. Giao diện người dùng (GUI)
-
-Chạy ứng dụng GUI:
-
-```bash
-python gui.py
-```
-
-Tính năng:
- + Tải ảnh hoặc sử dụng webcam.
-
- + Chọn loại phương tiện: Ô tô / Xe máy
-
- + Hiển thị: tên biển báo, mức phạt và độ chính xác.
-
-🖼️ Hình minh họa 2: Giao diện chính khi sử dụng
-
-![Screenshot 2025-06-30 131849](https://github.com/user-attachments/assets/51e01450-80bf-4b7a-b59d-693570d3350b)
-
-![Screenshot 2025-06-30 132221](https://github.com/user-attachments/assets/2d7d0c51-eec1-4958-b663-a65593a4f9af)
-
-
----
-## 📌 5. Ví dụ kết quả
-
-**Biển báo 1: Giới hạn tốc độ (30km/h)**
-
-Phạt ô tô  : 4–6 triệu VNĐ nếu vi phạm
-
-Phạt xe máy: 800k–1 triệu VNĐ nếu vi phạm
-
-Độ tin cậy: 100%
-
-
-
-**Biển báo 2: Vòng xuyến**
-
-Phạt oto - xe máy: 400-600k VNĐ nếu không tuân thủ biển
-
-Độ tin cậy: 100%
-
----
-## 📝Ghi chú thêm
-
-Dễ dàng mở rộng thêm loại biển báo Việt Nam.
-
-
-Có thể tích hợp thêm camera giám sát hoặc thiết bị nhúng.
-
-
-Mọi mức phạt mang tính tham khảo từ luật GT Việt Nam (2024–2025).
-
-
----
-## 👏 Cảm ơn
-
-Đây là dự án học thuật mang tính minh họa. Dataset sử dụng từ nguồn công khai trên Kaggle:
-[GTSRB - German Traffic Sign Recognition Benchmark](https://www.kaggle.com/datasets/meowmeowmeowmeowmeow/gtsrb-german-traffic-sign)
-
-
-
-
----
-
-## Kiến trúc mới: hai model
-
-Thay vì một model làm tất cả, hệ thống tách thành hai model:
-
-1. **Model định vị (`localizer`)**: nhận ảnh đầy đủ, dự đoán khung bao của biển báo.
-2. **Model phân loại (`recognizer`)**: nhận vùng biển báo đã cắt (48×48), dự đoán 1 trong 43 lớp.
-
-Hai model được huấn luyện riêng và ghép lại trong `pipeline.py`.
+## Cài đặt
 
 ```bash
 pip install -r requirements.txt
-python train.py --data path/to/gtsrb --out models     # huấn luyện cả hai model
-python evaluate.py --data path/to/gtsrb --models models  # đánh giá trên tập kiểm tra
 ```
 
-Dữ liệu GTSRB tải từ Kaggle (xem link ở trên), giải nén để có `Train.csv`, `Test.csv` và thư mục `Train/`, `Test/`.
+Nếu muốn YOLO chạy trên GPU NVIDIA, cài bản PyTorch có CUDA sau khi cài file trên:
+
+```bash
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126 --force-reinstall --no-deps
+```
+
+## Chạy nhận diện
+
+Trên một ảnh:
+
+```bash
+python predict.py duong_dan_anh.jpg
+```
+
+Trên webcam (nhấn `q` để thoát):
+
+```bash
+python live.py
+python live.py --camera 1   # nếu máy có nhiều camera
+```
+
+## Huấn luyện lại
+
+1. Chuẩn bị bộ Roboflow đã giải nén, chuyển sang định dạng YOLO:
+   ```bash
+   python prepare_vn_dataset.py --src path/to/rf-vn --out path/to/vn-yolo
+   ```
+2. Huấn luyện model định vị:
+   ```bash
+   yolo detect train model=yolov8n.pt data=path/to/vn-yolo/data.yaml epochs=30 imgsz=640 batch=8 device=0
+   ```
+3. Huấn luyện model phân loại (cần bộ GTSRB và bộ Roboflow):
+   ```bash
+   python train_recognizer.py --gtsrb path/to/gtsrb --vn path/to/rf-vn --out models
+   ```
+4. Đánh giá trên tập test:
+   ```bash
+   python evaluate.py --vn path/to/rf-vn --models models
+   ```
+
+Sau khi huấn luyện, copy `best.pt` của YOLO thành `models/detector_best.pt`. Các file model đã huấn luyện được đặt sẵn trong thư mục `models/`.
+
+## Dữ liệu
+
+- **Biển báo Việt Nam:** [Vietnamese Traffic Signs Detection (Roboflow Universe)](https://universe.roboflow.com/vietnamese-traffic-signs-detection-jbfbz/vietnamese-traffic-signs-detection), giấy phép CC BY 4.0.
+- **GTSRB:** [German Traffic Sign Recognition Benchmark (Kaggle)](https://www.kaggle.com/datasets/meowmeowmeowmeowmeow/gtsrb-german-traffic-sign), dùng để pretrain model phân loại.
+
+## Cấu trúc
+
+| File | Vai trò |
+|---|---|
+| `predict.py` | Nhận diện một ảnh, lưu ảnh có khung bao |
+| `live.py` | Nhận diện thời gian thực từ webcam |
+| `pipeline.py` | Ghép YOLO và model phân loại |
+| `models.py` | Kiến trúc model phân loại |
+| `data.py` | Đọc dữ liệu GTSRB và cắt vùng biển báo |
+| `prepare_vn_dataset.py` | Chuyển bộ Roboflow sang định dạng YOLO |
+| `train_recognizer.py` | Pretrain trên GTSRB, tinh chỉnh trên biển báo Việt Nam |
+| `evaluate.py` | Đánh giá hệ thống trên tập test |
+| `models/` | Model đã huấn luyện và danh sách lớp |
+
+Các file `traffic_sign.py` và `GUI.py` là phần của bản gốc, chỉ dùng model 43 lớp cũ (`my_model.h5`), không liên quan đến pipeline hiện tại.
+
+## Giấy phép
+
+MIT. Giữ nguyên thông báo bản quyền của Lilkremxxx theo yêu cầu của giấy phép gốc.

@@ -1,31 +1,11 @@
-"""Hai model tách riêng:
+"""Model phân loại biển báo đã cắt (model 2).
 
-- build_localizer(): model 1, tìm khung bao của biển báo trên ảnh đầy đủ.
-- build_recognizer(): model 2, phân loại biển báo đã cắt thành 43 lớp.
+Model định vị (model 1) là YOLO, được huấn luyện và dùng trực tiếp qua ultralytics
+(xem train_detector.py và pipeline.py).
 """
 from tensorflow.keras import layers, models
 
-from data import LOCALIZER_SIZE, NUM_CLASSES, RECOGNIZER_SIZE
-
-
-def _conv_block(x, filters):
-    x = layers.Conv2D(filters, 3, padding="same", use_bias=False)(x)
-    x = layers.BatchNormalization()(x)
-    x = layers.ReLU()(x)
-    return layers.MaxPool2D()(x)
-
-
-def build_localizer():
-    inputs = layers.Input((LOCALIZER_SIZE, LOCALIZER_SIZE, 3))
-    x = layers.Rescaling(1 / 255.0)(inputs)
-    x = layers.RandomTranslation(0.05, 0.05)(x)  # chỉ hoạt động lúc huấn luyện
-    for filters in (32, 64, 128, 128, 256):
-        x = _conv_block(x, filters)
-    x = layers.Flatten()(x)  # giữ vị trí không gian, quan trọng cho bài toán khung bao
-    x = layers.Dense(256, activation="relu")(x)
-    x = layers.Dropout(0.3)(x)
-    boxes = layers.Dense(4, activation="sigmoid", name="box")(x)
-    return models.Model(inputs, boxes, name="localizer")
+from data import RECOGNIZER_SIZE
 
 
 def _residual_block(x, filters):
@@ -39,7 +19,7 @@ def _residual_block(x, filters):
     return layers.ReLU()(layers.Add()([shortcut, y]))
 
 
-def build_recognizer():
+def build_recognizer(num_classes):
     inputs = layers.Input((RECOGNIZER_SIZE, RECOGNIZER_SIZE, 3))
     x = layers.Rescaling(1 / 255.0)(inputs)
     # Tăng cường dữ liệu chỉ chạy lúc huấn luyện
@@ -55,5 +35,5 @@ def build_recognizer():
         x = layers.MaxPool2D()(x)
     x = layers.GlobalAveragePooling2D()(x)
     x = layers.Dropout(0.3)(x)
-    outputs = layers.Dense(NUM_CLASSES, activation="softmax", name="class")(x)
+    outputs = layers.Dense(num_classes, activation="softmax", name="class")(x)
     return models.Model(inputs, outputs, name="recognizer")

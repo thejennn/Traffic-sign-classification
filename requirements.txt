@@ -2,7 +2,11 @@ numpy
 matplotlib
 pillow
 scikit-learn
+pandas
+pyyaml
+tqdm
 keras
 tensorflow
 opencv-python
+ultralytics
 tk
