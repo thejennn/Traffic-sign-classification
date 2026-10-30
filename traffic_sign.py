@@ -20,13 +20,13 @@ for i in range(classes):
 
     for a in images:
         try:
-            image = Image.open(path + '\\'+ a)
+            image = Image.open(os.path.join(path, a))
             image = image.resize((30,30))
             image = np.array(image)
             data.append(image)
             labels.append(i)
-        except:
-            print("Error loading image")
+        except Exception as e:
+            print(f"Error loading image {os.path.join(path, a)}: {e}")
 
 #Converting lists into numpy arrays
 data = np.array(data)
